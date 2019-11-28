@@ -3,89 +3,127 @@
 
 using namespace std;
 
-struct Node
+class Tree
 {
-	int t_data;
-	Node* parent;
-	Node* left;
-	Node* right;
-	Node(const int& data)
+private:
+	struct Node
 	{
-		t_data = data;
-		parent = nullptr;
-		left = nullptr;
-		right = nullptr;
+		int t_data;
+		Node* left;
+		Node* right;
+		Node(const int& data)
+		{
+			t_data = data;
+			left = nullptr;
+			right = nullptr;
+		}
+	};
+	Node* tree;
+public:
+	Tree()
+	{
+		tree = nullptr;
+	}
+	~Tree()
+	{
+		Clear();
+	}
+
+	void Add(int data)
+	{
+		if (!tree)
+		{
+			tree = new Node(data);
+			return;
+		}
+		Node* root = tree;
+		Node* elem = new Node(data);
+		while (root != nullptr)
+		{
+			if (elem->t_data > root->t_data)
+			{
+				if (root->right != nullptr)
+				{
+					root = root->right;
+				}
+				else
+				{
+					root->right = elem;
+					break;
+				}
+			}
+			else if (elem->t_data <= root->t_data)
+			{
+				if (root->left != nullptr)
+				{
+					root = root->left;
+				}
+				else
+				{
+					root->left = elem;
+					break;
+				}
+			}
+		}
+	}
+	void Print()
+	{
+		Node* root = tree;
+		std::stack<const Node*> stack;
+
+		while (root != nullptr || !stack.empty())
+		{
+			while (root != nullptr)
+			{
+				stack.push(root);
+				root = root->left;
+			}
+
+			std::cout << stack.top()->t_data << ' ';
+			root = stack.top()->right;
+			stack.pop();
+		}
+	}
+
+	void Clear()
+	{
+		while (tree != nullptr)
+		{
+			while (tree != nullptr)
+			{
+				tree = tree->left;
+			}
+
+			Node* elem = tree;
+			delete tree;
+			if (elem != nullptr)
+			{
+				tree = elem->right;
+			}
+			else
+			{
+				tree = nullptr;
+			}
+		}
 	}
 };
 
-void tree_add(Node* z, Node* x)
-{
-	while (x != nullptr)
-	{
-		if (z->t_data > x->t_data)
-		{
-			if (x->right != nullptr)
-			{
-				x = x->right;
-			}
-			else
-			{
-				z->parent = x;
-				x->right = z;
-				break;
-			}
-		}
-		else if (z->t_data <= x->t_data)
-		{
-			if (x->left != nullptr)
-			{
-				x = x->left;
-			}
-			else
-			{
-				z->parent = x;
-				x->left = z;
-				break;
-			}
-		}
-	}
-}
 
-void print_tree(const Node* root)
-{
-	std::stack<const Node*> stack;
 
-	while (root != nullptr || !stack.empty())
-	{
-		while (root != nullptr)
-		{
-			stack.push(root);
-			root = root->left;
-		}
 
-		std::cout << stack.top()->t_data << ' ';
-		root = stack.top()->right;
-		stack.pop();
-	}
-}
+
+
 int main()
 {
 	int n;//size
 	cin >> n;
-	Node* tree = nullptr;
-	Node* tmp = nullptr;
+	Tree tree;
 	for (int i = 0; i < n; i++)
 	{
 		int temp;
 		cin >> temp;
-		if (!tree)
-		{
-			tree = new Node(temp);
-			continue;
-		}
-		tmp = new Node(temp);
-		tree_add(tmp, tree);
+		tree.Add(temp);
 	}
-	print_tree(tree);
+	tree.Print();
 	return 0;
 }
